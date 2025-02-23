@@ -1,4 +1,4 @@
-import MovieRegister from "../components/movie/movieRegister";
+import MovieRegister from "../components/movie/movieComponent";
 
 export default function MoviesPage() {
   return (

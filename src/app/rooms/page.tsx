@@ -1,4 +1,4 @@
-import RoomRegister from "../components/room/roomRegister";
+import RoomRegister from "../components/room/roomComponent";
 
 export default function RoomsPage() {
   return (
