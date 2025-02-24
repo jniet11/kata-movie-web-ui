@@ -84,13 +84,14 @@ export default function MovieManager() {
         await loadMovies();
         alert("Película eliminada");
       } catch (error) {
-        alert("Error eliminando película");
+        alert("Error: No se puede eliminar una pelicula con una reserva vinculada.");
       }
     }
   };
 
   return (
     <div className="cine-container cine-glow">
+      <h1 className="cine-main-title">Cinema Kata 🎥😁</h1>
       <h2 className="cine-title">
         {editingMovie ? "Editar Película" : "Registrar Película"}
       </h2>

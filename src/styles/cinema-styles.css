@@ -126,3 +126,18 @@ body {
   margin-right: 0.5rem;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
+
+/* Título principal - Versión minimalista */
+.cine-main-title {
+  color: #ffd700;
+  font-size: 3rem;
+  text-align: center;
+  margin: 3rem 0;
+  padding: 1.5rem;
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+  background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+  position: relative;
+  overflow: hidden;
+}

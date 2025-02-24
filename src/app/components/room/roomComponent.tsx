@@ -76,13 +76,14 @@ export default function RoomManager() {
         await loadRooms();
         alert("Sala eliminada");
       } catch (error) {
-        alert("Error eliminando sala");
+        alert("Error: No se puede eliminar una sala con una reserva vinculada.");
       }
     }
   };
 
   return (
     <div className="cine-container cine-glow">
+      <h1 className="cine-main-title">Cinema Kata 🎥😁</h1>
       <h2 className="cine-title">
         {editingRoom ? "Editar Sala" : "Registrar Sala"}
       </h2>
