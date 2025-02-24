@@ -13,6 +13,7 @@ Interfaz web para sistema de gestión de cine - Technical Kata
 - [Tecnologías](#-tecnologías)
 - [Requisitos](#-requisitos)
 - [Instalación](#-instalación)
+- [Implementación](#-implementación)
 
 ## 🌟 Características
 
@@ -55,3 +56,11 @@ npm run build
 
 # 5. Iniciar servidor
 npm run dev
+```
+
+## Implementación
+
+- Para crear palículas ve a: http://localhost:4000/movies
+- Para crear salas ve a: http://localhost:4000/rooms
+- Para hacer una reserva ve a: http://localhost:4000/reservations
+- Para ver registros por película ve a: http://localhost:4000/records
