@@ -118,7 +118,13 @@ export default function MovieRecords() {
                           <span className="cine-text-gold font-bold">
                             Cliente:{" "}
                           </span>
-                          {reservation.customer_name || reservation.doc_number}
+                          {reservation.customer_name}
+                        </p>
+                        <p className="text-emerald-400">
+                          <span className="cine-text-gold font-bold">
+                            Documento:{" "}
+                          </span>
+                          {reservation.doc_number}
                         </p>
                         <p className="text-emerald-400">
                           <span className="cine-text-gold font-bold">

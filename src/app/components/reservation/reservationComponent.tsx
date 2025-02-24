@@ -6,6 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Reservation, Movie, Room } from "@/types/reserveInterface";
 
+const formatDateForInput = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
 const reservationSchema = z.object({
   customer_name: z
     .string()
@@ -17,11 +27,11 @@ const reservationSchema = z.object({
     .regex(/^\d{6,12}$/, "Documento inválido (6-12 dígitos)"),
   email: z.string().email("Email inválido"),
   movie_id: z.coerce.number().min(1, "Seleccione una película"),
-  room_id: z.coerce.number().min(1, "Seleccione una sala"),
   show_time: z
     .string()
     .min(1, "Seleccione fecha y hora")
     .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Formato de fecha inválido"),
+  room_id: z.coerce.number().min(1, "Seleccione una sala"),
 });
 
 export default function ReservationForm() {
@@ -32,16 +42,20 @@ export default function ReservationForm() {
   const [seats, setSeats] = useState<string[]>([]);
   const [editingReservation, setEditingReservation] =
     useState<Reservation | null>(null);
+  const [bookedSeats, setBookedSeats] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(reservationSchema),
   });
+
+  const watchedMovieId = watch("movie_id");
 
   useEffect(() => {
     const loadData = async () => {
@@ -67,6 +81,29 @@ export default function ReservationForm() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (watchedMovieId && selectedRoom) {
+      const currentSelection = {
+        movie_id: Number(watchedMovieId),
+        room_id: selectedRoom.id,
+      };
+
+      const conflictingReservations = reservations.filter((res) => {
+        if (editingReservation && res.id === editingReservation.id)
+          return false;
+        return (
+          res.movie_id === currentSelection.movie_id &&
+          res.room_id === currentSelection.room_id
+        );
+      });
+
+      const booked = conflictingReservations.flatMap((res) => res.seats);
+      setBookedSeats(booked);
+    } else {
+      setBookedSeats([]);
+    }
+  }, [watchedMovieId, selectedRoom, reservations, editingReservation]);
+
   const generateSeatMap = (capacity: number) => {
     const rows = Math.ceil(capacity / 10);
     return Array.from({ length: rows }, (_, rowIndex) =>
@@ -80,6 +117,10 @@ export default function ReservationForm() {
   };
 
   const toggleSeat = (seat: string) => {
+    if (bookedSeats.includes(seat)) {
+      alert("Este asiento ya está reservado");
+      return;
+    }
     setSeats((prev) => {
       if (prev.includes(seat)) {
         return prev.filter((s) => s !== seat);
@@ -94,8 +135,8 @@ export default function ReservationForm() {
     setValue("doc_number", reservation.doc_number);
     setValue("email", reservation.email);
     setValue("movie_id", reservation.movie_id);
+    setValue("show_time", formatDateForInput(reservation.show_time));
     setValue("room_id", reservation.room_id);
-    setValue("show_time", reservation.show_time.split(".")[0]);
 
     const parsedSeats = Array.isArray(reservation.seats)
       ? reservation.seats
@@ -203,7 +244,7 @@ export default function ReservationForm() {
           )}
         </div>
 
-        {/* Campo de Email */}
+        {/* Correo electrónico */}
         <div>
           <label className="cine-text-gold">Correo electrónico</label>
           <input
@@ -240,7 +281,22 @@ export default function ReservationForm() {
           )}
         </div>
 
-        {/* Selección de Sala */}
+        {/* Selección de Fecha y Hora */}
+        <div>
+          <label className="cine-text-gold">Fecha y Hora</label>
+          <input
+            type="datetime-local"
+            {...register("show_time")}
+            className={`cine-input ${errors.show_time && "border-red-500"}`}
+          />
+          {errors.show_time && (
+            <p className="cine-text-red text-sm mt-1">
+              {errors.show_time?.message?.toString()}
+            </p>
+          )}
+        </div>
+
+        {/* Selección de Sala (último campo) */}
         <div>
           <label className="cine-text-gold">Sala</label>
           <select
@@ -265,21 +321,6 @@ export default function ReservationForm() {
           )}
         </div>
 
-        {/* Selección de Horario */}
-        <div>
-          <label className="cine-text-gold">Fecha y Hora</label>
-          <input
-            type="datetime-local"
-            {...register("show_time")}
-            className={`cine-input ${errors.show_time && "border-red-500"}`}
-          />
-          {errors.show_time && (
-            <p className="cine-text-red text-sm mt-1">
-              {errors.show_time?.message?.toString()}
-            </p>
-          )}
-        </div>
-
         {/* Mapa de Asientos */}
         {selectedRoom && (
           <div className="mt-6">
@@ -295,10 +336,13 @@ export default function ReservationForm() {
                       type="button"
                       onClick={() => toggleSeat(seat!)}
                       className={`seat-button ${
-                        seats.includes(seat!)
+                        bookedSeats.includes(seat!)
+                          ? "bg-red-600 cursor-not-allowed"
+                          : seats.includes(seat!)
                           ? "bg-emerald-600 cine-glow"
                           : "bg-gray-700 hover:bg-gray-600"
                       }`}
+                      disabled={bookedSeats.includes(seat!)}
                     >
                       {seat!}
                     </button>

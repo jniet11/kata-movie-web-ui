@@ -51,10 +51,7 @@ cd kata-movie-web-ui
 # 3. Instalar dependencias
 npm install
 
-# 4. Construir proyecto
-npm run build
-
-# 5. Iniciar servidor
+# 5. Contruir el proyecto e Iniciar servidor
 npm run dev
 ```
 
