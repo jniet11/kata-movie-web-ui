@@ -4,17 +4,12 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Room } from "@/types/roomInterface";
 
 const roomSchema = z.object({
   name: z.string().min(1, "Nombre de la sala requerido"),
   capacity: z.number().min(1, "La capacidad debe ser mayor a 0"),
 });
-
-interface Room {
-  id: number;
-  name: string;
-  capacity: number;
-}
 
 export default function RoomManager() {
   const [rooms, setRooms] = useState<Room[]>([]);

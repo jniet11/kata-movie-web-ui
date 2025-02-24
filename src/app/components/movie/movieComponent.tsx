@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Movie } from "@/types/movieInterface";
 
 const movieSchema = z.object({
   title: z.string().min(1, "Título requerido"),
@@ -11,14 +12,6 @@ const movieSchema = z.object({
   duration: z.number().min(1, "Duración inválida"),
   classification: z.string().min(1, "Clasificación requerida"),
 });
-
-interface Movie {
-  id: number;
-  title: string;
-  gender: string;
-  duration: number;
-  classification: string;
-}
 
 export default function MovieManager() {
   const [movies, setMovies] = useState<Movie[]>([]);

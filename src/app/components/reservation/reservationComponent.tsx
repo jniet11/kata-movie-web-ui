@@ -4,45 +4,25 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Reservation, Movie, Room } from "@/types/reserveInterface";
 
 const reservationSchema = z.object({
-  customer_name: z.string()
+  customer_name: z
+    .string()
     .min(5, "El nombre debe tener al menos 5 caracteres")
     .max(50, "El nombre no puede exceder 50 caracteres")
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s']+$/, "Nombre inválido"),
-  doc_number: z.string()
+  doc_number: z
+    .string()
     .regex(/^\d{6,12}$/, "Documento inválido (6-12 dígitos)"),
   email: z.string().email("Email inválido"),
   movie_id: z.coerce.number().min(1, "Seleccione una película"),
   room_id: z.coerce.number().min(1, "Seleccione una sala"),
-  show_time: z.string()
+  show_time: z
+    .string()
     .min(1, "Seleccione fecha y hora")
     .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Formato de fecha inválido"),
 });
-
-interface Movie {
-  id: number;
-  title: string;
-}
-
-interface Room {
-  id: number;
-  name: string;
-  capacity: number;
-}
-
-interface Reservation {
-  id: number;
-  customer_name: string;
-  doc_number: string;
-  email: string;
-  movie_id: number;
-  room_id: number;
-  show_time: string;
-  seats: string[];
-  movie_title: string;
-  room_name: string;
-}
 
 export default function ReservationForm() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -50,7 +30,8 @@ export default function ReservationForm() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [seats, setSeats] = useState<string[]>([]);
-  const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+  const [editingReservation, setEditingReservation] =
+    useState<Reservation | null>(null);
 
   const {
     register,
@@ -115,7 +96,7 @@ export default function ReservationForm() {
     setValue("movie_id", reservation.movie_id);
     setValue("room_id", reservation.room_id);
     setValue("show_time", reservation.show_time.split(".")[0]);
-    
+
     const parsedSeats = Array.isArray(reservation.seats)
       ? reservation.seats
       : JSON.parse(reservation.seats || "[]");
@@ -128,7 +109,9 @@ export default function ReservationForm() {
   const handleDeleteReservation = async (id: number) => {
     if (confirm("¿Estás seguro de eliminar esta reserva?")) {
       try {
-        await axios.post("http://localhost:3000/cinema/delete-reservation", { id });
+        await axios.post("http://localhost:3000/cinema/delete-reservation", {
+          id,
+        });
         setReservations((prev) => prev.filter((r) => r.id !== id));
         alert("Reserva eliminada");
       } catch (error) {
@@ -169,7 +152,9 @@ export default function ReservationForm() {
         ]);
       }
 
-      alert(`Reserva ${editingReservation ? "actualizada" : "creada"} exitosamente!`);
+      alert(
+        `Reserva ${editingReservation ? "actualizada" : "creada"} exitosamente!`
+      );
       reset();
       setSeats([]);
       setEditingReservation(null);
